@@ -1,10 +1,13 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerGio : MonoBehaviour
 {
     private Rigidbody rb;
     private CapsuleCollider col;
     private PlayerCollision collisionEvents;
+    [SerializeField]
+    private Camera cam;
     [SerializeField]
     private float maxForwardSpeed;
     [SerializeField]
@@ -51,8 +54,9 @@ public class PlayerGio : MonoBehaviour
     {
         if (!Dead){
             Debug.Log("Spawn ragdoll");
-            Instantiate(Resources.Load<GameObject>("Ragdoll"), transform);
+            GameObject ragdoll = Instantiate(Resources.Load<GameObject>("Ragdoll"), transform);
             PlayerModel.SetActive(false);
+            cam.GetComponent<CameraScript>().StartDeathCam(ragdoll);
             Dead = true;
         }
     }
@@ -64,6 +68,8 @@ public class PlayerGio : MonoBehaviour
             ToggleSlide();
             ApplyForwardForce();
             HorizontalMovement();
+        }else{
+            RestartOnPress();
         }
     }
 
@@ -116,6 +122,13 @@ public class PlayerGio : MonoBehaviour
         if (sliding)
         {
            rb.AddForce(new Vector3(-rb.linearVelocity.x, 0f, 0f).normalized * slideStopForce * Time.deltaTime, ForceMode.Acceleration);
+        }
+    }
+    
+    private void RestartOnPress(){
+        if (Input.GetKey(KeyCode.Space))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

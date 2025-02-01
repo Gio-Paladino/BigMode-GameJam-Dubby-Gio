@@ -4,7 +4,7 @@ public class PlayerGio : MonoBehaviour
 {
     private Rigidbody rb;
     private CapsuleCollider col;
-
+    private PlayerCollision collisionEvents;
     [SerializeField]
     private float maxForwardSpeed;
     [SerializeField]
@@ -13,14 +13,17 @@ public class PlayerGio : MonoBehaviour
     private float sideForce;
     [SerializeField]
     private float forwardforce;
-
     [SerializeField]
     private float slideStopForce;
     private bool sliding = false;
     private bool tryToStopSliding = false;
+    private bool Dead = false;
 
     [SerializeField]
     private Transform CeilingCheckCastOrigin;
+
+    [SerializeField]
+    private GameObject PlayerModel;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -30,13 +33,38 @@ public class PlayerGio : MonoBehaviour
 
     }
 
+     private void Awake()
+    {
+        collisionEvents = GetComponent<PlayerCollision>();    
+    }
+
+    private void OnEnable()
+    {
+        collisionEvents.OnCrash += InvokeRagdoll;
+    }
+    private void OnDisable()
+    {
+        collisionEvents.OnCrash -= InvokeRagdoll;
+    }
+
+    void InvokeRagdoll()
+    {
+        if (!Dead){
+            Debug.Log("Spawn ragdoll");
+            Instantiate(Resources.Load<GameObject>("Ragdoll"), transform);
+            PlayerModel.SetActive(false);
+            Dead = true;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        ToggleSlide();
-        ApplyForwardForce();
-        HorizontalMovement();
-        
+        if (!Dead){
+            ToggleSlide();
+            ApplyForwardForce();
+            HorizontalMovement();
+        }
     }
 
     private void ToggleSlide()
@@ -44,7 +72,7 @@ public class PlayerGio : MonoBehaviour
         if (!sliding && Input.GetKeyDown(KeyCode.S))
         {
             col.height = col.height / 2f;
-            col.center += Vector3.down * 0.25f;
+            col.center += Vector3.down * 0.5f;
             sliding = true;
         }
         if (Input.GetKeyUp(KeyCode.S))
@@ -55,12 +83,12 @@ public class PlayerGio : MonoBehaviour
         if (tryToStopSliding)
         {
             Debug.Log("tryToStopSliding = " + tryToStopSliding);
-            Debug.DrawRay(CeilingCheckCastOrigin.position, Vector3.up * 2f, Color.red, 2f, false);
+            Debug.DrawRay(CeilingCheckCastOrigin.position, transform.TransformDirection(Vector3.up) * 2f, Color.red, 2f, false);
             RaycastHit hit;
-            if(!Physics.Raycast(CeilingCheckCastOrigin.position, Vector3.up, out hit, 1f))
+            if(!Physics.Raycast(CeilingCheckCastOrigin.position, transform.TransformDirection(Vector3.up), out hit, 1f))
             {
                 col.height = col.height * 2f;
-                col.center += Vector3.up * 0.25f;
+                col.center += Vector3.up * 0.5f;
                 sliding = false;
                 tryToStopSliding = false;
             }

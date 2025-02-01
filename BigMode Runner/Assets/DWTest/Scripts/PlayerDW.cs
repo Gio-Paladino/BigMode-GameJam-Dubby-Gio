@@ -18,9 +18,7 @@ public class PlayerDW : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
     }
-
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
         ApplyForwardForce();
         HorizontalMovement();
@@ -32,6 +30,25 @@ public class PlayerDW : MonoBehaviour
             rb.AddForce(transform.TransformDirection(Vector3.forward) * forwardforce * Time.deltaTime);
     }
 
+
+    private void HorizontalMovement()
+    {
+        if (Input.GetKey(KeyCode.A))
+        {
+            rb.AddRelativeTorque(transform.TransformDirection(Vector3.down) * sideForce * Time.deltaTime);
+            rb.AddForce(transform.TransformDirection(Vector3.left) * sideForce/10 * Time.deltaTime);
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            rb.AddRelativeTorque(transform.TransformDirection(Vector3.up) * sideForce * Time.deltaTime);
+            rb.AddForce(transform.TransformDirection(Vector3.right) * sideForce/10 * Time.deltaTime);
+
+        }
+    }
+
+
+    /*
     private void HorizontalMovement()
     {
             if (Input.GetKey(KeyCode.A))
@@ -44,4 +61,5 @@ public class PlayerDW : MonoBehaviour
             rb.AddForce(transform.TransformDirection(Vector3.right) * sideForce * Time.deltaTime);
         }
     }
+    */
 }

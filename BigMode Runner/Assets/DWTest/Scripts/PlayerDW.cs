@@ -3,7 +3,8 @@ using UnityEngine;
 public class PlayerDW : MonoBehaviour
 {
     private Rigidbody rb;
-
+    private CapsuleCollider col;
+    private PlayerCollision collisionEvents;
     [SerializeField]
     private float maxForwardSpeed;
     [SerializeField]
@@ -12,16 +13,94 @@ public class PlayerDW : MonoBehaviour
     private float sideForce;
     [SerializeField]
     private float forwardforce;
+    [SerializeField]
+    private float slideStopForce;
+    [SerializeField]
+    private float BoostForce;
+    private bool sliding = false;
+    private bool tryToStopSliding = false;
+    private bool Dead = false;
+    private bool hasBoost = false;
+
+
+    [SerializeField]
+    private Transform CeilingCheckCastOrigin;
+
+    [SerializeField]
+    private GameObject PlayerModel;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<CapsuleCollider>();
+
     }
-    private void FixedUpdate()
+
+    private void Awake()
     {
-        ApplyForwardForce();
-        HorizontalMovement();
+        collisionEvents = GetComponent<PlayerCollision>();
+    }
+
+    private void OnEnable()
+    {
+        collisionEvents.OnCrash += InvokeRagdoll;
+    }
+    private void OnDisable()
+    {
+        collisionEvents.OnCrash -= InvokeRagdoll;
+    }
+
+    void InvokeRagdoll()
+    {
+        if (!Dead)
+        {
+            Debug.Log("Spawn ragdoll");
+            Instantiate(Resources.Load<GameObject>("Ragdoll"), transform);
+            PlayerModel.SetActive(false);
+            Dead = true;
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (!Dead)
+        {
+            ToggleSlide();
+            ApplyForwardForce();
+            HorizontalMovement();
+
+        }
+    }
+
+    private void ToggleSlide()
+    {
+        if (!sliding && Input.GetKeyDown(KeyCode.S))
+        {
+            col.height = col.height / 2f;
+            col.center += Vector3.down * 0.5f;
+            sliding = true;
+        }
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            tryToStopSliding = true;
+        }
+
+        if (tryToStopSliding)
+        {
+            Debug.Log("tryToStopSliding = " + tryToStopSliding);
+            Debug.DrawRay(CeilingCheckCastOrigin.position, transform.TransformDirection(Vector3.up) * 2f, Color.red, 2f, false);
+            RaycastHit hit;
+            if (!Physics.Raycast(CeilingCheckCastOrigin.position, transform.TransformDirection(Vector3.up), out hit, 1f))
+            {
+                col.height = col.height * 2f;
+                col.center += Vector3.up * 0.5f;
+                sliding = false;
+                tryToStopSliding = false;
+            }
+        }
     }
 
     private void ApplyForwardForce()
@@ -30,36 +109,35 @@ public class PlayerDW : MonoBehaviour
             rb.AddForce(transform.TransformDirection(Vector3.forward) * forwardforce * Time.deltaTime);
     }
 
-
     private void HorizontalMovement()
     {
-        if (Input.GetKey(KeyCode.A))
-        {
-            rb.AddRelativeTorque(transform.TransformDirection(Vector3.down) * sideForce * Time.deltaTime);
-            rb.AddForce(transform.TransformDirection(Vector3.left) * sideForce/10 * Time.deltaTime);
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            rb.AddRelativeTorque(transform.TransformDirection(Vector3.up) * sideForce * Time.deltaTime);
-            rb.AddForce(transform.TransformDirection(Vector3.right) * sideForce/10 * Time.deltaTime);
-
-        }
-    }
-
-
-    /*
-    private void HorizontalMovement()
-    {
-            if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) && !sliding)
         {
             rb.AddForce(transform.TransformDirection(Vector3.left) * sideForce * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D) && !sliding)
         {
             rb.AddForce(transform.TransformDirection(Vector3.right) * sideForce * Time.deltaTime);
         }
+
+        if (sliding)
+        {
+            rb.AddForce(new Vector3(-rb.linearVelocity.x, 0f, 0f).normalized * slideStopForce * Time.deltaTime, ForceMode.Acceleration);
+        }
     }
-    */
+
+
+    public void GainBoost()
+    {
+        hasBoost = true;
+    }
+
+    public void CheckSpeedBoost()
+    {
+        if (Input.GetKey(KeyCode.Space) && hasBoost)
+        {
+            rb.AddForce(transform.TransformDirection(Vector3.forward) * BoostForce, ForceMode.Impulse);
+        }
+    }
 }

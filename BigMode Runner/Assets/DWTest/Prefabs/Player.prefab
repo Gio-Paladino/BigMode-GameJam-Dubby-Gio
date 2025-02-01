@@ -326,20 +326,6 @@ MonoBehaviour:
   castOrigin: {fileID: 4672323591081994388}
   rb: {fileID: 5423568176497981841}
   gravityStrength: 5000
-  lookPath:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  pointThreshold: 20
 --- !u!114 &4839284318189287807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,6 +342,10 @@ MonoBehaviour:
   maxHorizontalSpeed: 25
   sideForce: 6000
   forwardforce: 8000
+  slideStopForce: 4000
+  BoostForce: 5000
+  CeilingCheckCastOrigin: {fileID: 4157501363121499356}
+  PlayerModel: {fileID: 0}
 --- !u!1 &6300034530421166000
 GameObject:
   m_ObjectHideFlags: 0

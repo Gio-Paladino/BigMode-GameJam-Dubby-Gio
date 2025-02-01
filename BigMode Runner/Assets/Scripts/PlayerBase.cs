@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerGio : MonoBehaviour
+public class PlayerBase : MonoBehaviour
 {
     private Rigidbody rb;
     private CapsuleCollider col;
@@ -18,6 +18,8 @@ public class PlayerGio : MonoBehaviour
     private float forwardforce;
     [SerializeField]
     private float slideStopForce;
+     [SerializeField]
+    private float BoostForce;
     private bool sliding = false;
     private bool tryToStopSliding = false;
     private bool Dead = false;
@@ -27,6 +29,7 @@ public class PlayerGio : MonoBehaviour
 
     [SerializeField]
     private GameObject PlayerModel;
+    private bool hasBoost = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -129,6 +132,19 @@ public class PlayerGio : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
+        public void GainBoost()
+    {
+        hasBoost = true;
+    }
+
+    public void CheckSpeedBoost()
+    {
+        if (Input.GetKey(KeyCode.Space) && hasBoost)
+        {
+            rb.AddForce(transform.TransformDirection(Vector3.forward) * BoostForce, ForceMode.Impulse);
         }
     }
 }

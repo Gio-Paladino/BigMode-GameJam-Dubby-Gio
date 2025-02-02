@@ -45,7 +45,7 @@ public class EffectPad : MonoBehaviour
                     player.DoJump(jumpForce, Vector3.up);
                     break;
                 case effectType.deathPad:
-                    player.DoJump(jumpForce, transform.TransformDirection(Vector3.up));
+                    player.DoJump(jumpForce, Vector3.up);
                     player.Die();
                     break;
             }

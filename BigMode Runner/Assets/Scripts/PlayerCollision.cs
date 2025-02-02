@@ -14,4 +14,12 @@ public class PlayerCollision : MonoBehaviour
             OnCrash?.Invoke();
         }
     }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Obstacle")
+        {
+            OnCrash?.Invoke();
+        }
+    }
 }

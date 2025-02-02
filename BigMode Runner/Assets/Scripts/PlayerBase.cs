@@ -85,9 +85,12 @@ public class PlayerBase : MonoBehaviour
             ApplyForwardForce();
             HorizontalMovement();
             PowerupCheck();
+            CheckGround();
         }else{
             RestartOnPress();
         }
+
+        
     }
 
     private void ToggleSlide()
@@ -97,6 +100,7 @@ public class PlayerBase : MonoBehaviour
             col.height = col.height / 2f;
             col.center += Vector3.down * 0.5f;
             sliding = true;
+            PlayerModel.GetComponent<Animator>().SetBool("Sliding", true);
         }
         if (Input.GetKeyUp(KeyCode.S))
         {
@@ -114,6 +118,7 @@ public class PlayerBase : MonoBehaviour
                 col.center += Vector3.up * 0.5f;
                 sliding = false;
                 tryToStopSliding = false;
+                PlayerModel.GetComponent<Animator>().SetBool("Sliding", false);
             }
         }
     }
@@ -139,6 +144,16 @@ public class PlayerBase : MonoBehaviour
         if (sliding)
         {
            rb.AddForce(new Vector3(-rb.linearVelocity.x, 0f, 0f).normalized * slideStopForce * Time.deltaTime, ForceMode.Acceleration);
+        }
+    }
+
+    private void CheckGround(){
+        RaycastHit hit;
+        if(Physics.Raycast(CeilingCheckCastOrigin.position, transform.TransformDirection(Vector3.down), out hit, 1.5f))
+        {
+            PlayerModel.GetComponent<Animator>().SetBool("Falling", false);
+        }else{
+            PlayerModel.GetComponent<Animator>().SetBool("Falling", true);
         }
     }
     
@@ -189,7 +204,9 @@ public class PlayerBase : MonoBehaviour
     IEnumerator BoostMaxSpeed(float duration, float ammount)
     {
         maxForwardSpeed += ammount;
+        PlayerModel.GetComponent<Animator>().SetBool("Boosting", true);
         yield return new WaitForSeconds(duration);
+        PlayerModel.GetComponent<Animator>().SetBool("Boosting", false);
         maxForwardSpeed -= ammount;
     }
 }

@@ -1,13 +1,11 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerBase : MonoBehaviour
 {
-    private Rigidbody rb;
-    private CapsuleCollider col;
-    private PlayerCollision collisionEvents;
-    [SerializeField]
-    private Camera cam;
+    [Header("Basic Parameters")]
+
     [SerializeField]
     private float maxForwardSpeed;
     [SerializeField]
@@ -18,18 +16,33 @@ public class PlayerBase : MonoBehaviour
     private float forwardforce;
     [SerializeField]
     private float slideStopForce;
-     [SerializeField]
-    private float BoostForce;
+
+    [Header("Powerup Parameters")]
+
+    [SerializeField]
+    private float boostAmmount;
+    [SerializeField]
+    private float boostDuration;
+    [SerializeField]
+    private float jumpForce;
+
+    [Header("Components")]
+    [SerializeField]
+    private Camera cam;
+    [SerializeField]
+    private Transform CeilingCheckCastOrigin;
+    [SerializeField]
+    private GameObject PlayerModel;
+
+    private Rigidbody rb;
+    private CapsuleCollider col;
+    private PlayerCollision collisionEvents;
+
     private bool sliding = false;
     private bool tryToStopSliding = false;
     private bool Dead = false;
-
-    [SerializeField]
-    private Transform CeilingCheckCastOrigin;
-
-    [SerializeField]
-    private GameObject PlayerModel;
     private bool hasBoost = false;
+    private bool hasJump = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -46,14 +59,14 @@ public class PlayerBase : MonoBehaviour
 
     private void OnEnable()
     {
-        collisionEvents.OnCrash += InvokeRagdoll;
+        collisionEvents.OnCrash += Die;
     }
     private void OnDisable()
     {
-        collisionEvents.OnCrash -= InvokeRagdoll;
+        collisionEvents.OnCrash -= Die;
     }
 
-    void InvokeRagdoll()
+    public void Die()
     {
         if (!Dead){
             Debug.Log("Spawn ragdoll");
@@ -71,6 +84,7 @@ public class PlayerBase : MonoBehaviour
             ToggleSlide();
             ApplyForwardForce();
             HorizontalMovement();
+            PowerupCheck();
         }else{
             RestartOnPress();
         }
@@ -135,16 +149,47 @@ public class PlayerBase : MonoBehaviour
         }
     }
 
-        public void GainBoost()
+    public void GainBoost()
     {
         hasBoost = true;
     }
-
-    public void CheckSpeedBoost()
+    public void GainJump()
     {
-        if (Input.GetKey(KeyCode.Space) && hasBoost)
+        hasJump = true;
+    }
+
+
+
+    public void PowerupCheck()
+    {
+        if (Input.GetKey(KeyCode.LeftShift) && hasBoost)
         {
-            rb.AddForce(transform.TransformDirection(Vector3.forward) * BoostForce, ForceMode.Impulse);
+            DoSpeedBoost(boostDuration, boostAmmount);
+            rb.AddForce(transform.TransformDirection(Vector3.forward) * boostAmmount, ForceMode.Impulse);
+            hasBoost = false;
         }
+
+        if (Input.GetKey(KeyCode.Space) && hasJump)
+        {
+            DoJump(jumpForce, Vector3.up);
+            hasJump = false;
+        }
+    }
+
+    public void DoJump(float force, Vector3 direction)
+    {
+        rb.AddForce(transform.TransformDirection(direction) * force, ForceMode.Impulse);
+    }
+
+    public void DoSpeedBoost(float duration, float ammount)
+    {
+        StartCoroutine(BoostMaxSpeed(duration, ammount));
+    }
+
+    IEnumerator BoostMaxSpeed(float duration, float ammount)
+    {
+        maxForwardSpeed += ammount;
+        yield return new WaitForSeconds(duration);
+        maxForwardSpeed -= ammount;
     }
 }

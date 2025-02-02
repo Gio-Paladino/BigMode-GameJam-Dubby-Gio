@@ -21,6 +21,7 @@ public class CameraScript : MonoBehaviour
             //transform.rotation = lookdirection;
         }
     }
+
      public void StartDeathCam(GameObject ragdoll){
         transform.SetParent(null);
         playerIsDead = true;

@@ -1199,7 +1199,7 @@ SkinnedMeshRenderer:
   m_SortingOrder: 0
   serializedVersion: 2
   m_Quality: 0
-  m_UpdateWhenOffscreen: 0
+  m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
   m_Mesh: {fileID: 4493585093827132993, guid: 83dba7015d460134b81ead1d49a64660, type: 3}
   m_Bones:
@@ -11607,6 +11607,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8972451761332899261}
     m_Modifications:
+    - target: {fileID: 1112230830989524439, guid: 496cb651fac384548881a60bf8122df5, type: 3}
+      propertyPath: m_Quality
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1112230830989524439, guid: 496cb651fac384548881a60bf8122df5, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7073722099291880679, guid: 496cb651fac384548881a60bf8122df5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.1215851

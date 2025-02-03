@@ -47,6 +47,10 @@ public class EffectPad : MonoBehaviour
                 case effectType.deathPad:
                     player.DoJump(jumpForce, Vector3.up);
                     player.Die();
+                    Animator ani = GetComponent<Animator>();
+                    if (ani != null){
+                        ani.SetBool("Spring", true);
+                    }
                     break;
             }
         }

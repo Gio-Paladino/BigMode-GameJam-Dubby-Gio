@@ -33,6 +33,8 @@ public class PlayerBase : MonoBehaviour
     private Transform CeilingCheckCastOrigin;
     [SerializeField]
     private GameObject PlayerModel;
+    [SerializeField]
+    private GameObject DeadText;
 
     private Rigidbody rb;
     private CapsuleCollider col;
@@ -71,8 +73,10 @@ public class PlayerBase : MonoBehaviour
         if (!Dead){
             Debug.Log("Spawn ragdoll");
             GameObject ragdoll = Instantiate(Resources.Load<GameObject>("Ragdoll"), transform);
+            ragdoll.transform.GetChild(0).GetChild(1).GetChild(9).GetComponent<Rigidbody>().linearVelocity = rb.linearVelocity;
             PlayerModel.SetActive(false);
             cam.GetComponent<CameraScript>().StartDeathCam(ragdoll);
+            DeadText.SetActive(true);
             Dead = true;
         }
     }

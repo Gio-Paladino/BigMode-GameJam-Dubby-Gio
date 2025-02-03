@@ -9,6 +9,8 @@ public class EndOfLevel : MonoBehaviour
     private GameObject Model;
     [SerializeField]
     private GameObject Player;
+    [SerializeField]
+    private Timer timer;
     void OnTriggerEnter(Collider other){
         if (other.gameObject.tag == "Player")
         {
@@ -16,6 +18,7 @@ public class EndOfLevel : MonoBehaviour
             Model.GetComponent<Animator>().SetBool("SwitchSwitch", true);
             WinText.SetActive(true);
             Player.GetComponent<PlayerBase>().setDead(true);
+            timer.enabled = false;
         }
     }
 }

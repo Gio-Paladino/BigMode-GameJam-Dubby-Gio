@@ -213,4 +213,9 @@ public class PlayerBase : MonoBehaviour
         PlayerModel.GetComponent<Animator>().SetBool("Boosting", false);
         maxForwardSpeed -= ammount;
     }
+
+    public void setDead(bool kill){
+        Dead = kill;
+        PlayerModel.GetComponent<Animator>().SetBool("Idle", true);
+    }
 }
